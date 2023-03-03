@@ -2,11 +2,13 @@ export default class HandGestureView {
   #canvas = document.querySelector(`#hands`)
   #canvasContext = this.#canvas.getContext(`2d`)
   #handFingesIndexes
+  #styler
 
-  constructor({ handFingesIndexes }) {
+  constructor({ handFingesIndexes, styler }) {
     this.#handFingesIndexes = handFingesIndexes
     this.#canvas.width = globalThis.screen.availWidth
     this.#canvas.height = globalThis.screen.availHeight
+    this.#styler = styler
   }
 
   clearCanvas() {
@@ -30,6 +32,7 @@ export default class HandGestureView {
   clickOnElement(x, y) {
     const element = document.elementFromPoint(x, y);
     if (!element) return;
+    this.#hoverElement(element)
     const rect = element.getBoundingClientRect()
     const event = new MouseEvent(`click`, {
       cancelable: true,
@@ -39,6 +42,12 @@ export default class HandGestureView {
       bubbles: true,
     })
     element.dispatchEvent(event)
+  }
+
+  #hoverElement(element) {
+    const toggleHover = () => this.#styler.toggleStyle(element, ':hover');
+    toggleHover()
+    setTimeout(toggleHover, 500)
   }
 
   #drawJoints(keypoints) {

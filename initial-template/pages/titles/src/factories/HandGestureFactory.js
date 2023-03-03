@@ -12,11 +12,14 @@ import { handFingesIndexes } from "../util/util.js"
 
 const camera = await Camera.init();
 
+let styler = new PseudoStyler();
+await styler.loadDocumentStyles();
+
 const factory = {
   async initalize() {
     return HandGestureController.initialize({
       camera,
-      view: new HandGestureView({ handFingesIndexes }),
+      view: new HandGestureView({ handFingesIndexes, styler }),
       service: new HandGestureService({
         fingerpose: window.fp,
         handPoseDetection: window.handPoseDetection,
