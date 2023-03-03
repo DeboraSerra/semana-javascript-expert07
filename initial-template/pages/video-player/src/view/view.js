@@ -1,9 +1,13 @@
-export default class View {
+export default class MainView {
   #btnInit = document.querySelector(`#init`)
   #statusElem = document.querySelector(`#status`)
   #videoFrameCanvas = document.createElement(`canvas`)
   #canvasContext = this.#videoFrameCanvas.getContext(`2d`, { willReadFrequently: true })
   #videoElem = document.querySelector(`#video`);
+
+  getVideoSrc(url) {
+    this.#videoElem.src = url;
+  }
 
   getVideoFrame(video) {
     const canvas = this.#videoFrameCanvas

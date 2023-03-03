@@ -1,19 +1,10 @@
-function prepareRunChecker({ timeDelay }) {
-  let lastEvent = Date.now()
-  return {
-    shouldRun() {
-      const result = (Date.now() - lastEvent) > timeDelay
-      if (result) lastEvent = Date.now()
-      return result;
-    }
-  }
-}
+import { prepareRunChecker } from "../../../../shared/util.js";
 
 const { shouldRun } = prepareRunChecker({ timeDelay: 500 })
 
 const EAR_THRESHOLD = 0.27;
 
-export default class Service {
+export default class MainService {
   #model = null
   #faceLandmarksDetection
   constructor({ faceLandmarksDetection }) {
@@ -21,7 +12,10 @@ export default class Service {
   }
 
   async loadModel() {
-    this.#model = await this.#faceLandmarksDetection.load(this.#faceLandmarksDetection.SupportedPackages.mediapipeFacemesh, { maxFaces: 1 })
+    this.#model = await this.#faceLandmarksDetection.load(
+      this.#faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+      { maxFaces: 1 }
+    )
   }
 
   // Calculate the position of eyelid to predict a blink
@@ -66,7 +60,7 @@ export default class Service {
     return false
   }
 
-  #estimateFaces(video) {
+  async #estimateFaces(video) {
     return this.#model.estimateFaces({
       input: video,
       returnTensors: false,

@@ -1,15 +1,15 @@
-import Camera from "../../../shared/Camera.js"
-import { supportsWorkerType } from "../../../shared/util.js"
-import Controller from "./controller.js"
-import Service from "./service.js"
-import View from "./view.js"
+import Camera from "../../../../shared/Camera.js"
+import { supportsWorkerType } from "../../../../shared/util.js"
+import MainController from "../controller/controller.js"
+import MainService from "../service/service.js"
+import MainView from "../view/view.js"
 
 async function getWorker() {
-  if (supportsWorkerType()) {
-    console.log(`initializing esm workers`)
-    const worker = new Worker(`./src/worker.js`, { type: 'module' })
-    return worker
-  }
+  // if (supportsWorkerType()) {
+  //   console.log(`initializing esm workers`)
+  //   const worker = new Worker(`./src/worker.js`, { type: 'module' })
+  //   return worker
+  // }
   console.warn(`Your browser doesn't supports wsm modules webworkers`)
   console.warn(`Importing dependencies`)
   await import("https://unpkg.com/@tensorflow/tfjs-core@2.4.0/dist/tf-core.js")
@@ -19,15 +19,15 @@ async function getWorker() {
 
   console.warn('using worker mock intead!')
 
-  const service = new Service({
+  const service = new MainService({
     faceLandmarksDetection: window.faceLandmarksDetection
   })
 
   const workerMock = {
     async postMessage(video) {
-      const {leftBlink, rightBlink} = await service.handBlinked(video);
-      if (!leftBlink || !rightBlink) return
-      workerMock.onmessage({ data: { leftBlink, rightBlink } })
+      const blinked = await service.handBlinked(video);
+      if (!blinked) return
+      worker.onmessage({ data: { blinked } })
     },
     // onmessage vai ser sobrescrito pelo controller
     onmessage(msg) {}
@@ -36,19 +36,22 @@ async function getWorker() {
   console.log(`loading tf model`)
   await service.loadModel()
   console.log(`tf model loaded`)
-  setTimeout(() => worker.onmessage({ data: `READY` }), 1000)
+  setTimeout(() => worker.onmessage({ data: `READY` }), 500)
 
   return workerMock
 }
 
+const view = new MainView()
+const [rootPath] = window.location.href.split('/pages/')
+view.getVideoSrc(`${rootPath}/assets/video.mp4`)
+
 const worker = await getWorker();
 
 const camera = await Camera.init();
-const [rootPath] = window.location.href.split('/pages/')
 const factory = {
   async initalize() {
-    return Controller.initialize({
-      view: new View(),
+    return MainController.initialize({
+      view: new MainView(),
       worker,
       camera
     })

@@ -1,4 +1,4 @@
-export default class Controller {
+export default class MainController {
   #view
   #camera
   #worker
@@ -11,7 +11,7 @@ export default class Controller {
   }
 
   static async initialize(deps) {
-    const controller = new Controller(deps)
+    const controller = new MainController(deps)
     controller.log(`not yet detecting eye blink! click in the button to start`)
     return controller.init()
   }
@@ -19,20 +19,21 @@ export default class Controller {
   #configureWorker(worker) {
     let ready = false
     worker.onmessage = ({ data }) => {
-      if (`READY` === data) {
-        console.log(`Worker is ready`)
-        this.#view.enableButton();
-        ready = true;
-        return;
+      if ('READY' === data) {
+        console.log('worker is ready!')
+        this.#view.enableButton()
+        ready = true
+        return
       }
       const blinked = data.blinked
       this.#blinkCounter += blinked
-      console.log({ blinked })
       this.#view.togglePlayVideo()
+      console.log('blinked', blinked)
     }
+
     return {
-      send (msg) {
-        if (!ready) return;
+      send(msg) {
+        if (!ready) return
         worker.postMessage(msg)
       }
     }
@@ -47,7 +48,7 @@ export default class Controller {
     const img = this.#view.getVideoFrame(video)
     this.#worker.send(img)
     this.log(`detecting eye blink`)
-    setInterval(() => this.loop(), 100)
+    // setTimeout(() => this.loop(), 100)
   }
 
   log(text) {
