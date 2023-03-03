@@ -11,12 +11,30 @@
       width: 95%;
       margin: 10px;
     }
+    button {
+      margin: 10px;
+      padding: 12px 24px;
+      background-color: blueviolet;
+      border: none;
+      /* color: black; */
+      border-radius: 8px;
+    }
+
+    .btn_container{
+      margin: 12px;
+    }
   </style>
 </head>
 
 <body>
-  <video id="video" src="/assets/video.mp4" controls></video>
-  </script>
+  <canvas id="hands" style="position: fixed; top: 100px;"></canvas>
+  <div class="btn_container">
+    <div><button id="init" type="button" disabled>Initialize blink recognition</button></div>
+    <output id="status"></output>
+  </div>
+  <video id="video" controls></video>
+  <script src="./src/index.js" type="module"></script>
+  <script type='text/javascript' src='https://cdn.jsdelivr.net/gh/TSedlar/pseudo-styler@1.0.8/pseudostyler.js'></script>
 </body>
 
 </html>
